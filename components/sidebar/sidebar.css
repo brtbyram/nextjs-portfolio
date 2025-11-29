@@ -1,0 +1,119 @@
+
+
+.sidebar-button:hover {
+    background-color: #455ce9;
+
+    transition: background-color 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+
+.fixed-nav {
+    font-family: Arial, Helvetica, sans-serif;
+    padding: min(140px) min(5%, 120px) min(5%, 140px);
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    z-index: 100;
+    overflow: hidden;
+    top: 0;
+    right: 0;
+    width: min(630px, 100vw);
+    height: 100%;
+    background-color: #1C1D20;
+    transition: transform .8s cubic-bezier(.7, 0, .2, 1);
+    will-change: transform;
+
+    & h5 {
+        padding-top: 10px;
+        color: #f3f3f3;
+        opacity: 0.5;
+        font-size: 0.7rem;
+        font-weight: 400;
+
+    }
+
+    & .sidebar-line {
+        width: 100%;
+        height: 1px;
+        background-color: #ffffff33;
+        margin: 20px auto 0;
+
+    }
+
+
+    .page-nav {
+        font-size: clamp(3rem, 4vw, 4rem);
+        margin-top: 20px;
+        line-height: normal;
+        text-decoration: none;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        align-items: start;
+
+        & li {
+            color: #f3f3f3 transition
+        }
+
+        & li:hover {
+            color: #6d6d6d;
+
+        }
+    }
+
+    .social-nav {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+
+        & a {
+            color: #f3f3f3;
+            font-size: 1rem;
+            transition: color 0.3s ease;
+
+            &:hover {
+                color: #6d6d6d;
+            }
+        }
+    }
+
+}
+
+
+
+
+
+.open-sidebar {
+    animation: reveal 0.8s cubic-bezier(.7, 0, .2, 1) forwards;
+}
+
+.close-sidebar {
+    animation: hide 0.8s cubic-bezier(.7, 0, .2, 1) forwards;
+}
+
+
+@keyframes reveal {
+    0% {
+        clip-path: ellipse(0% 50% at 100% 50%);
+    }
+
+    100% {
+        clip-path: ellipse(100% 180% at 50% 50%);
+
+    }
+}
+
+
+@keyframes hide {
+    from {
+        clip-path: ellipse(100% 180% at 50% 50%);
+    }
+
+    to {
+        clip-path: ellipse(0% 50% at 100% 50%);
+        transform: translateX(100%);
+    }
+}

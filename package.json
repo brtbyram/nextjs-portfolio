@@ -21,6 +21,8 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "framer-motion": "^11.5.6",
+    "gsap": "^3.13.0",
+    "locomotive-scroll": "^5.0.0-beta.21",
     "lucide-react": "^0.445.0",
     "next": "14.2.13",
     "react": "^18",

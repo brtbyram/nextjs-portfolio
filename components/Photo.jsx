@@ -28,18 +28,18 @@ function Photo() {
               ease: 'easeInOut',
             }
           }}
-          className='w-[298px] h-[298px] xl:w-[498px] xl:h-[498px] mix-blend-lighten absolute'>
-          {/* <Image
-            src=""
+          className='w-[298px] h-[298px] xl:w-[498px] xl:h-[498px] mix-blend-lighten absolute bottom-0'>
+          <Image
+            src="/assets/my-photo.png"
             priority // bu resmin yüklenmesini önceliklendirir ve diğerlerini bekletir
             quality={100}
             fill
             alt=''
-            className='object-contain' /> */}
+            className='object-contain drop-shadow-2xl overflow-hidden' />
         </motion.div>
 
         <motion.svg
-          className="w-[300px] h-[300px] xl:w-[506px] xl:h-[506px]"
+          className="w-[300px] h-[300px] xl:w-[506px] xl:h-[506px] relative z-10 "
           fill="transparent"
           viewBox={`0 0 506 506`}
           xmlns="http://www.w3.org/2000/svg"
@@ -59,7 +59,6 @@ function Photo() {
               repeat: Infinity,
               repeatType: 'reverse'
             }}
-
             />
         </motion.svg>
       </motion.div>
