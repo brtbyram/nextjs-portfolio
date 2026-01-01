@@ -3,91 +3,14 @@ import "./resume.css"
 import Image from 'next/image'
 import { useEffect, useRef } from "react";
 
-import LocomotiveScroll from "locomotive-scroll";
-
-
-
-
-
 function Resume() {
 
 
-  const scrollRef = useRef(null);
-
-  const buttonRef = useRef(null);
-
-  const handleMouseMove = (e) => {
-    const button = buttonRef.current;
-    const rect = button.getBoundingClientRect();
-
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    button.style.setProperty('--x', `${x}px`);
-    button.style.setProperty('--y', `${y}px`);
-  };
-
-
-  useEffect(() => {
-    const scroll = new LocomotiveScroll({
-      el: scrollRef.current,
-      smooth: true,
-    });
-
-    return () => {
-      scroll.destroy();
-    };
-  }, []);
-
   return (
-    <>
-
-      {/* <div className="no-scroll-overlay"></div>
+    <div className="resume-page">
 
 
-      <div className="loading-container" >
-        <div className="loading-screen">
-          <div className="rounded-div-wrap top">
-            <div className="rounded-div"></div>
-          </div>
-          <div className="loading-words">
-            <h2 className="home-active home-active-first">Hello<div className="dot"></div></h2>
-            <h2 className="home-active">Bonjour<div className="dot"></div></h2>
-            <h2 className="home-active">स्वागत हे<div className="dot"></div></h2>
-            <h2 className="home-active">Ciao<div className="dot"></div></h2>
-            <h2 className="home-active">Olá<div className="dot"></div></h2>
-            <h2 className="home-active jap">おい<div className="dot"></div></h2>
-            <h2 className="home-active">Hallå<div className="dot"></div></h2>
-            <h2 className="home-active">Guten tag<div className="dot"></div></h2>
-            <h2 className="home-active-last">Hallo<div className="dot"></div></h2>
-            <h2 className="active">Home<div className="dot"></div></h2>
-            <h2>Work<div className="dot"></div></h2>
-            <h2>TWICE<div className="dot"></div></h2>
-            <h2>The Damai<div className="dot"></div></h2>
-            <h2>FABRIC™<div className="dot"></div></h2>
-            <h2>Aanstekelijk<div className="dot"></div></h2>
-            <h2>Base Create<div className="dot"></div></h2>
-            <h2>AVVR<div className="dot"></div></h2>
-            <h2>GraphicHunters<div className="dot"></div></h2>
-            <h2>Future Goals<div className="dot"></div></h2>
-            <h2>Atypikal<div className="dot"></div></h2>
-            <h2>One:Nil<div className="dot"></div></h2>
-            <h2>Andy Hardy<div className="dot"></div></h2>
-            <h2>About<div className="dot"></div></h2>
-            <h2>Contact<div className="dot"></div></h2>
-            <h2>Success<div className="dot"></div></h2>
-            <h2>Archive<div className="dot"></div></h2>
-            <h2>Error<div className="dot"></div></h2>
-            <h2>Styleguide<div className="dot"></div></h2>
-          </div>
-          <div className="rounded-div-wrap bottom">
-            <div className="rounded-div"></div>
-          </div>
-        </div>
-      </div> */}
-
-      <section className='home-header h-screen sm:min-h-[115vh] bg-[#a0a0a0] relative flex justify-center items-center overflow-hidden'
-        ref={scrollRef}
+      <section className='home-header min-h-screen sm:min-h-[115vh] bg-[#a0a0a0] relative flex justify-center items-center overflow-hidden'
         data-container
         data-scroll
       >
@@ -178,12 +101,11 @@ function Resume() {
 
       <button
         ref={buttonRef}
-        onMouseMove={handleMouseMove}
         className="relative m-40 overflow-hidden px-6 py-3 rounded-lg bg-indigo-600 text-white font-medium transition duration-300 ease-in-out ripple-button"
       >
         Dalga Butonu
       </button>
-    </>
+    </div>
   )
 }
 

@@ -2,26 +2,114 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  body {
-    @apply font-primary bg-primary text-white leading-loose antialiased scroll-smooth;
-  }
-  .h1 {
-    @apply text-[48px] xl:text-[80px] leading-[1.1] font-semibold
-  }
-  .h2 {
-    @apply text-[36px] xl:text-[48px] leading-[1.1] font-semibold
-  }
-  .h3 {
-    @apply text-[20px] xl:text-[24px] leading-[1.1] font-semibold
-  }
-  .text-outline {
-    -webkit-text-stroke: 1px #ffffff;
-  }
-  
-  .text-outline-hover {
-    -webkit-text-stroke: 1px #00ff99;
-  }
+:root {
+  --color-background: var(--ci-cream);
+  --font-family-normal: font-normal-medium, sans-serif;
+  --color: var(--ci-black);
+  --font-size-p1: 1.125rem;
+  --line-height-135: 1.35em;
+  --font-family-narrow: font-narrow-semibold, sans-serif;
+  --font-size-h1: 11.5rem;
+  --line-height-80: .8em;
+  --letter-spacing-6: -.06em;
+  --font-size-h2: 3.25rem;
+  --line-height-110: 1.1em;
+  --letter-spacing-4: -.04em;
+  --font-size-h3: 1.75rem;
+  --font-family-mono: font-mono-medium, sans-serif;
+  --font-size-c1: .875rem;
+  --line-height-100: 1em;
+  --font-size-f1: .5rem;
+  --icon-width: 1.25rem;
+  --icon-height: 1.25rem;
+  --size-12: .75rem;
+  --size-120: 7.5rem;
+  --size-80: 5rem;
+  --size-24: 1.5rem;
+  --size-48: 3rem;
+  --size-16: 1rem;
+  --size-8: .5rem;
+  --color-accent-peach: var(--ci-peach);
+  --color-accent-pink: var(--ci-pink);
+  --border-radius-3: .1875rem;
+  --color-accent: var(--ci-yellow);
+  --size-4: .25rem;
+  --color-background-beige: var(--ci-beige);
+  --letter-spacing-0: 0em;
+  --size-64: 4rem;
+  --size-2: .125rem;
+  --grid-gutter: var(--size-8);
+  --size-144: 9rem;
+  --grid-margin: 1.5rem;
+  --size-32: 2rem;
+  --font-size-f2: .75rem;
+  --color-accent-violet: var(--ci-violet);
+  --size-96: 6rem;
+  --ci-cream: #f9f4eb;
+  --ci-white: white;
+  --ci-black: black;
+  --ci-black-60: #0009;
+  --ci-yellow: #ffe32e;
+  --ci-pink: #ffd2f3;
+  --ci-violet: #e5daf6;
+  --ci-beige: #f0ece5;
+  --ci-peach: #ffdcc1;
+  --smooth-ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -o-font-smoothing: antialiased;
+  -webkit-appearance: none;
+  box-sizing: border-box;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family-normal);
+  font-size: var(--font-size-p1);
+  line-height: var(--line-height-135);
+  font-weight: var(--font-weight-medium);
 }
 
 
+@layer base {
+  body {
+    @apply font-primary text-white leading-loose antialiased scroll-smooth;
+  }
+
+  .h1 {
+    @apply text-[48px] xl:text-[80px] leading-[1.1] font-semibold
+  }
+
+  .h2 {
+    @apply text-[36px] xl:text-[48px] leading-[1.1] font-semibold
+  }
+
+  .h3 {
+    @apply text-[20px] xl:text-[24px] leading-[1.1] font-semibold
+  }
+
+  .text-outline {
+    -webkit-text-stroke: 1px #ffffff;
+  }
+
+  .text-outline-hover {
+    -webkit-text-stroke: 1px #00ff99;
+  }
+
+}
+
+
+
+
+.spotlight svg path {
+  stroke-dasharray: 12000;
+  stroke-dashoffset: 12000;
+  animation: dash 5s forwards ease-in-out;
+}
+
+.heroHeading {
+  mix-blend-mode: difference !important;
+} 

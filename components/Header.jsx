@@ -6,7 +6,7 @@ import MobileNav from './MobileNav'
 
 function Header() {
     return (
-        <header className="py-8 xl:py-12 text-white hidden">
+        <header className="py-8 xl:py-12 text-white fixed w-full top-0 left-0 z-50 bg-primary/80 backdrop-blur-md">
             <div className="container mx-auto flex justify-between items-center">
                 {/* Logo */}
                 <Link href="/">

@@ -29,7 +29,7 @@ export default function Services() {
                 }
             );
             gsap.to(".hero-services", {
-                backgroundColor: "#000000", ease: "none", scrollTrigger: {
+                     scrollTrigger: {
                     trigger: servicesRef.current,
                     start: "top top",
                     end: "bottom bottom",
@@ -44,10 +44,13 @@ export default function Services() {
 
 
     return (
-        <div ref={servicesRef} className='min-h-screen w-full flex flex-col'>
+        <div ref={servicesRef} className='min-h-screen w-screen flex flex-col'>
 
-            <section className="hero-services h-screen relative w-screen overflow-hidden">
-                <WaterRippleWrapper quality={0.7}/>
+            <section className="hero-services h-screen relative w-screen  bg-[#FFF5BA] flex justify-center items-center">
+                <WaterRippleWrapper quality={0.80} />
+                <div className='hero-scale absolute left-10 bottom-14 text-5xl font-semibold text-[#FFF5BA] z-10 pointer-events-none leading-12'>
+                    Helping brands to stand out in the digital era.<br/> No nonsense, always on the cutting edge.
+                </div>
             </section>
 
             <section className='min-h-screen w-full bg-white flex flex-col justify-center items-center p-8 gap-6'>
