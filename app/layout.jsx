@@ -4,7 +4,7 @@ import "./globals.css";
 import Sidebar from "@/components/sidebar/Sidebar";
 import Providers from "@/lib/providers";
 
-import GrainShaderWrapper from "@/components/animate/GrainShader";
+import GrainShaderWrapper from "@/components/animate/GrainShaderWrapper";
 
 
 const jetbrainsMono = JetBrains_Mono({

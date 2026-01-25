@@ -4,9 +4,6 @@ import { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import LogoTilt from "./TiltLogo";
-import GsapDeneme from "./GsapDeneme";
-import { Grid } from "lucide-react";
 import GridStagger from "./GsapDeneme";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -92,11 +89,6 @@ function AboutPage() {
                 background: "radial-gradient(70.77% 70.77% at 0% 70.77%, #ffd9b0 0%, #fd9f3b 80.73%, #ff8709 100%);"
             }} className="h-[100vh]  flex items-center justify-center">
 
-            </section>
-
-
-            <section className="h-[100vh] flex items-center justify-center">
-                <LogoTilt/>
             </section>
 
             <section className="min-h-screen bg-neutral-900">

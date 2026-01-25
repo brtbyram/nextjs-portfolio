@@ -5,8 +5,6 @@ import { gsap } from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Image from "next/image";
-import { Mask } from "@react-three/drei";
-import MaskCursor from "@/components/MaskCursor";
 import { useCursor } from "@/lib/context/CursorContext";
 import RevealText from "@/app/resume/RevealText";
 import clsx from "clsx";
@@ -240,8 +238,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-
 
     </main >
   );
