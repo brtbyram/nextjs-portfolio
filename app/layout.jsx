@@ -1,15 +1,11 @@
 
 import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/Header";
-import PageTransition from "@/components/PageTransition";
-import StairTransition from "@/components/StairTransition";
 import Sidebar from "@/components/sidebar/Sidebar";
 import Providers from "@/lib/providers";
 
-import dynamic from "next/dynamic";
+import GrainShaderWrapper from "@/components/animate/GrainShader";
 
-const DynamicScrollComponent = dynamic(() => import("@/components/LocomotiveScrollComponent"), { ssr: false });
 
 const jetbrainsMono = JetBrains_Mono({
   weights: [100, 200, 300, 400, 500, 600, 700, 800],
@@ -26,11 +22,11 @@ export default function RootLayout({ children }) {
 
   return (
     <html lang="en">
-      <body className={jetbrainsMono.variable}>
+      <body className={jetbrainsMono.variable + " md:cursor-none"}>
         <Providers>
+            <GrainShaderWrapper />
           <div className="relative min-h-screen h-full w-full">
             <Sidebar />
-            {/* <StairTransition /> */}
             {children}
           </div>
         </Providers>

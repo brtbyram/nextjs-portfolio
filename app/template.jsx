@@ -98,10 +98,9 @@ export default function Template({ children }) {
   }, { scope: containerRef, dependencies: [pathname] });
 
   return (
-    <div ref={containerRef} className="relative min-h-screen w-full overflow-hidden bg-white">
-      {/* Orijinal Stillerin Korundu */}
-      <div className="overlay fixed inset-0 z-[9999] bg-primary pointer-events-none" />
-      <li className="text list-disc fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[10000] text-5xl text-white capitalize opacity-0" />
+    <div ref={containerRef} className="relative min-h-screen w-full overflow-hidden ">
+      <div style={{ willChange: "clip-path , transform" }} className="overlay fixed inset-0 z-[9999] bg-primary pointer-events-none" />
+      <div className="text list-disc fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[10000] text-5xl text-white capitalize" />
       <div className="children">{children}</div>
     </div>
   );

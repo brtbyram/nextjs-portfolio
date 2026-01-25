@@ -6,7 +6,7 @@ import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import "./work.css";
 import { DrawSVGPlugin } from "gsap/DrawSVGPlugin";
-import BackgroundShader from "@/components/BackgroundShader";
+
 
 
 

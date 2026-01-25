@@ -1,7 +1,7 @@
 import React, { useMemo, useRef, useState, useEffect } from 'react'
 import * as THREE from 'three'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { useFBO, OrthographicCamera, Text3D } from '@react-three/drei'
+import { useFBO, OrthographicCamera, RenderTexture, PerspectiveCamera, Text, Center, Text3D } from '@react-three/drei'
 import {
     simulationVertexShader,
     simulationFragmentShader,
@@ -10,12 +10,14 @@ import {
     grainVertexShader,
     grainFragmentShader
 } from '../shaders/waterRippleShaders'
+import gsap from 'gsap'
+import { useGSAP } from '@gsap/react'
 
 // 1. AYARLAR (Magic Number'lardan kurtulduk)
 const CONFIG = {
     colors: {
-        bg: new THREE.Color(4 / 255, 49 / 255, 148 / 255),
-        text: new THREE.Color(255 / 255, 255 / 255, 255 / 255),
+        bg: new THREE.Color(10 / 255, 18 / 255, 97 / 255), // #0a1261
+        text: new THREE.Color(255 / 255, 245 / 255, 186 / 255), // #FFF5BA
     },
     text: {
         content: 'murathan',
@@ -28,35 +30,7 @@ const CONFIG = {
     }
 }
 
-// 2. TEXTURE OLUŞTURUCU HOOK (Mantığı ayırdık)
-function useTextTexture(width, height) {
-    return useMemo(() => {
-        const canvas = document.createElement('canvas')
-        canvas.width = width
-        canvas.height = height
-        const ctx = canvas.getContext('2d')
 
-        // Temizlik
-        ctx.fillStyle = 'rgba(0,0,0,0)'
-        ctx.fillRect(0, 0, width, height)
-
-        // Yazı Ayarları
-        const fontSize = Math.floor(width / 5)
-        ctx.font = `900 ${fontSize}px ${CONFIG.text.font.replace('900 ', '')}` // Font size dinamik
-        ctx.textAlign = 'center'
-        ctx.fillStyle = 'white'
-        ctx.translate(0, -fontSize / 4)
-
-
-        // Çizim
-        ctx.fillText(CONFIG.text.content, width / 2, height * 0.4) // Ortalamayı basitleştirdik
-
-        const texture = new THREE.CanvasTexture(canvas)
-        texture.minFilter = THREE.LinearFilter
-        texture.magFilter = THREE.LinearFilter
-        return texture
-    }, [width, height])
-}
 
 // 3. BOYUT HESAPLAYICI HOOK
 function useSimulationDims(size, quality) {
@@ -87,7 +61,7 @@ function RippleScene({ quality }) {
 
     const bufferA = useFBO(width, height, fboOptions)
     const bufferB = useFBO(width, height, fboOptions)
-    const textTexture = useTextTexture(width, height)
+
 
     // Shader Material Tanımları
     const simMaterial = useMemo(() => new THREE.ShaderMaterial({
@@ -98,37 +72,33 @@ function RippleScene({ quality }) {
             frame: { value: 0 }
         },
         vertexShader: simulationVertexShader,
-        fragmentShader: simulationFragmentShader,
+        fragmentShader: simulationFragmentShader
     }), [width, height])
 
     const renderMaterial = useMemo(() => new THREE.ShaderMaterial({
         uniforms: {
             textureA: { value: null },
-            textTexture: { value: textTexture },
+            textTexture: { value: null },
             backgroundColor: { value: CONFIG.colors.bg },
             textColor: { value: CONFIG.colors.text },
         },
         vertexShader: renderVertexShader,
         fragmentShader: renderFragmentShader,
-    }), [textTexture])
+        transparent: true,
+    }), [])
 
     const grainMaterial = useMemo(() => new THREE.ShaderMaterial({
         transparent: true,
         depthWrite: false,
         uniforms: {
             time: { value: 0 },
-            opacity: { value: 0.18 },
-            pixelSize: { value: 2400.0 },
+            opacity: { value: 0.08 },
+            pixelSize: { value: 8000.0 },
         },
         vertexShader: grainVertexShader,
         fragmentShader: grainFragmentShader
     }), [])
 
-    // Referanslar
-    const currentBuffer = useRef(bufferA)
-    const nextBuffer = useRef(bufferB)
-    const frameCount = useRef(0)
-    const mouseRef = useRef(new THREE.Vector2(-10, -10))
 
     // Sahne (Tekrar tekrar oluşturmamak için memo dışında statik tutulabilir ama memo da ok)
     const simScene = useMemo(() => {
@@ -140,48 +110,105 @@ function RippleScene({ quality }) {
 
     const simCamera = useMemo(() => new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1), [])
 
-    // R3F Pointer Sistemini Kullanmak (Daha Temiz)
+    const dynamicFontSize = useMemo(() => {
+        const textLength = CONFIG.text.content.length
+        return (viewport.width / textLength) * 1.5 // 1.5 çarpanı fontun doluluğuna göre ayarlanabilir
+    }, [viewport.width])
+
+    // Yazıyı ekranın üst kısmına konumlandırmak için Y ekseni hesaplaması
+    // viewport.height / 2 ekranın en üstüdür. Biraz boşluk bırakmak için 0.7 ile çarpıyoruz.
+    const topPosition = (viewport.height / 2) * 0.7
+
+    // Referanslar
+    const currentBuffer = useRef(bufferA)
+    const nextBuffer = useRef(bufferB)
+    const frameCount = useRef(0)
+    const mouseRef = useRef(new THREE.Vector2(-10, -10))
+    const lastPointer = useRef(new THREE.Vector2(0, 0))
+    const textRef = useRef()
+    const materialRef = useRef()
+
     useFrame((state) => {
-        // 1. Mouse Koordinatlarını R3F state'inden al (Event listener'a gerek yok!)
-        // Pointer normalde -1 ile 1 arasındadır, bunu doku boyutuna map ediyoruz.
-        if (state.pointer.x !== 0 && state.pointer.y !== 0) {
-            // Basitçe pointer'ı texture koordinatlarına çevirme:
-            const mouseX = ((state.pointer.x + 1) / 2) * width
-            const mouseY = ((state.pointer.y + 1) / 2) * height
-            mouseRef.current.set(mouseX, mouseY)
+        const { gl, pointer, clock } = state
+
+        // 1. MOUSE HAREKET KONTROLÜ
+        // Sadece koordinat farkı varsa simülasyonu besliyoruz
+        const distSq = pointer.distanceToSquared(lastPointer.current)
+        const isMoving = distSq > 0.00001
+
+        // 3. SİMÜLASYON KOORDİNAT GÜNCELLEME
+        if (isMoving) {
+            mouseRef.current.set(
+                ((pointer.x + 1) / 2) * width,
+                ((pointer.y + 1) / 2) * height
+            )
         }
 
-        // 2. Frame Skipping (30 FPS Simulation)
-
-
-        // 3. Ping-Pong Simulation
+        // 4. GPGPU PING-PONG SİMÜLASYONU
         simMaterial.uniforms.frame.value = frameCount.current++
+
         simMaterial.uniforms.mouse.value = mouseRef.current
         simMaterial.uniforms.textureA.value = currentBuffer.current.texture
 
+        // Render Pipeline
         gl.setRenderTarget(nextBuffer.current)
         gl.render(simScene, simCamera)
         gl.setRenderTarget(null)
 
+        // Simülasyon verisini (textureA) ana materyale gönder
         renderMaterial.uniforms.textureA.value = nextBuffer.current.texture
 
-        // Ping-pong swap
+        // Buffer Swap
         const temp = currentBuffer.current
         currentBuffer.current = nextBuffer.current
         nextBuffer.current = temp
-        grainMaterial.uniforms.time.value += 0.016
+
+        // Grain ve Pointer Takibi
+        grainMaterial.uniforms.time.value = clock.getElapsedTime()
+        lastPointer.current.copy(pointer)
     })
 
     return (
         <>
+
             <mesh>
                 <planeGeometry args={[2, 2]} />
-                <primitive object={renderMaterial} attach="material" />
+                <primitive object={renderMaterial} attach="material">
+                    <RenderTexture attach="uniforms-textTexture-value" frames={Infinity}>
+                        {/* 3. ÇÖZÜM: OrthographicCamera kullanımı tutarsızlığı bitirir */}
+                        <OrthographicCamera
+                            makeDefault
+                            manual
+                            top={viewport.height / 2}
+                            bottom={-viewport.height / 2}
+                            left={-viewport.width / 2}
+                            right={viewport.width / 2}
+                            near={-1}
+                            far={1}
+                            position={[0, 0, 0]}
+                        />
+                        <Center position={[0, topPosition, 0]} ref={textRef}>
+                            <Text
+                                fontSize={dynamicFontSize}
+                                color="white"
+                                fontWeight={700}
+                                textAlign="center"
+                                anchorX="center"
+                                anchorY="middle"
+                                maxWidth={viewport.width * 0.9}
+                            >
+                                {CONFIG.text.content}
+                            </Text>
+                        </Center>
+                    </RenderTexture>
+
+                </primitive>
             </mesh>
             <mesh>
                 <planeGeometry args={[2, 2]} />
                 <primitive object={grainMaterial} attach="material" />
             </mesh>
+
         </>
     )
 }
@@ -196,23 +223,16 @@ export default function WaterRippleWrapper({ children, quality }) {
 
     return (
         <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-            {/* HTML İÇERİK */}
-            <div style={{ position: 'relative', zIndex: 10 }}>
+
+            <div style={{ zIndex: 2 }}>
                 {children}
             </div>
-
-            {/* CANVAS */}
-            <div style={{
-                position: 'absolute',
-                inset: 0, // Top, Right, Bottom, Left = 0 demektir
-                zIndex: 1
-            }}>
+            <div style={{ position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none', willChange: 'transform' }}>
                 <Canvas
-                    dpr={[1, 2]} // Cihazın kendi çözünürlüğüne izin ver ama 2'yi geçme
+                    dpr={[1, 2]}
                     camera={{ position: [0, 0, 1] }}
                     gl={{ antialias: false }}
-                    // Canvas'ın bulunduğu div'in boyutuna tam oturmasını sağlar
-                    style={{ width: '100%', height: '100%' }}
+
                 >
                     <OrthographicCamera
                         makeDefault

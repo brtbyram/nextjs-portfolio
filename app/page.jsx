@@ -7,7 +7,9 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Image from "next/image";
 import { Mask } from "@react-three/drei";
 import MaskCursor from "@/components/MaskCursor";
-
+import { useCursor } from "@/lib/context/CursorContext";
+import RevealText from "@/app/resume/RevealText";
+import clsx from "clsx";
 
 // GSAP eklentilerini kaydet
 gsap.registerPlugin(ScrollTrigger);
@@ -21,9 +23,25 @@ export default function Home() {
   const wrapperRef = useRef(null); // Metinleri saran dış div
   const tlRef = useRef(null);      // Timeline referansı
   const itemsRef = useRef([]);     // Kopyalanmış metin öğeleri için ref
+  const footerRef = useRef(null);
+
+  const { setVariant, setCursorText } = useCursor();
+
+  // Helper fonksiyonlar
+  const enterText = (text) => {
+    setCursorText(text);
+    setVariant("text");
+  };
+
+  const enterMask = () => setVariant("mask");
+  const leave = () => {
+    setVariant("default");
+    setCursorText("");
+  };
 
   useGSAP(() => {
     const item = itemsRef.current[0]; // burada ilk öğeyi alıyoruz 
+    const footerRounded = footerRef.current.querySelector('.footer-rounded');
     if (!item) return;
 
     // İlk öğenin genişliği kadar kaydıracağız
@@ -59,7 +77,7 @@ export default function Home() {
     ScrollTrigger.create({
       trigger: sectionRef.current,
       start: "top bottom",     // Bölüm ekrana girerken
-      end: "bottom top",       // Bölüm ekrandan çıkarken
+      end: "bottom top",       // Bölüm ekrandan çıkarken 
 
       onUpdate: (self) => {
         // Aşağı kaydırma (self.direction === 1): Metin SAĞA kaysın (timeScale: -1)
@@ -77,6 +95,18 @@ export default function Home() {
 
     gsap.to(tl, { timeScale: -1, duration: 0, delay: 0 });
 
+    gsap.to(footerRounded, {
+      height: 0,
+      ease: "power4.out",
+      duration: 1.5,
+      scrollTrigger: {
+        trigger: footerRef.current,
+        start: "top bottom",
+        end: "bottom top",
+        scrub: true
+      }
+    });
+
   }, { scope: sectionRef, revertOnUpdate: true });
 
   // Metinleri render ederken dinamik olarak ref'lere atama
@@ -84,13 +114,45 @@ export default function Home() {
     if (el) itemsRef.current[index] = el;
   };
 
+
+  const works = [{
+    title: "Subrella",
+    year: "2021",
+    field: "subscription Management",
+  },
+  {
+    title: "StayHubs",
+    year: "2020",
+    field: "Co-living Platform",
+  },
+  {
+    title: "YourTrainer",
+    year: "2022",
+    field: "Fitness App",
+  },
+  {
+    title: "FoodieFinds",
+    year: "2019",
+    field: "Restaurant Locator",
+  },
+  {
+    title: "TravelMate",
+    year: "2023",
+    field: "Travel Services",
+  },
+  {
+    title: "ShopSmart",
+    year: "2021",
+    field: "E-commerce",
+  }
+  ];
+
   return (
     <main className="min-h-screen overflow-x-hidden h-full" ref={container}>
 
       <section className="h-full relative" ref={sectionRef}>
         <div className='bg-[#a0a0a0] relative h-screen flex justify-center items-center overflow-hidden'>
           <Image
-
             src="/assets/my-photo2.png"
             alt="Resume"
             width={750}
@@ -123,73 +185,63 @@ export default function Home() {
           </div>
         </div>
       </section>
-      <MaskCursor />
+
+      <section className="works-section h-screen w-screen flex flex-col items-center justify-center space-y-3 bg-neutral-800 relative">
+
+        {works.map((work, index) => (
+          <div
+            key={index}
+            className={clsx(`work-item scene `, index % 2 === 0 ? '' : '')}
+            onMouseEnter={() => enterText(work.title)}
+            onMouseLeave={leave}>
+            <div class="prism">
+              <div class="face face-front text-4xl bg-neutral-200 px-5">
+                <div className="">{work.title}</div>
+                <div className="font-extrabold text-8xl">{work.year}</div>
+              </div>
+              <div class="face face-back"></div>
+              <div class="face face-right"></div>
+              <div class="face face-left"></div>
+              <div class="face face-top bg-[#992e40]"></div>
+              <div class="face face-bottom "></div>
+            </div>
+          </div>
+        ))}
+
+      </section>
+
+      <section className=" h-screen w-screen flex flex-col items-center justify-center space-y-3 bg-neutral-100 relative">
+
+        <div className="absolute bottom-10 text-center w-full text-black pointer-events-none ">
+          <p className="text-2xl font-medium">Scroll down to see more</p>
+        </div>
+
+      </section>
 
 
-      <section className="hero">
-        <div className="flex justify-center items-center h-full">
-          <h1 className="text-4xl font-bold text-black">
-            Designed and developed by Berat Murathan Bayram
-          </h1>
+
+      <section ref={footerRef} className="footer bg-[#1a1a1a] h-screen  text-white flex flex-col justify-between" >
+        
+        <div className="footer-rounded h-28 w-screen top-0 left-1/2 -translate-x-1/2 relative overflow-hidden">
+          <div className="h-[550%] w-[150%] absolute  left-1/2 -translate-x-1/2 -translate-y-[86.66%] rounded-[50%] bg-neutral-100 " />
+        </div>
+
+        <div className="flex-1 flex items-end justify-center -translate-x-[1vw] md:-translate-y-[4vh]">
+          <div style={{
+            backgroundImage: 'linear-gradient(45deg, #ff8a00, #e52e71)',
+            backgroundClip: 'text',
+            WebkitTextStrokeWidth: '0.5vw',
+            WebkitTextStrokeColor: '#d7d5d5',
+            color: '#1a1a1a',
+            WebkitBackgroundClip: 'text',
+            fontWeight: '900',
+          }} className="text-[25vw] italic h-96 w-screen flex items-end justify-center">
+            bemuba
+          </div>
         </div>
       </section>
 
-      <section className="spotlight text-black">
-        <div className="row">
-          <div><Image src="/assets/my-photo2.png" width={200} height={200} /></div>
-        </div>
-        <div className="row">
-          <div className="col">
-            <div className="card">
-              <h2>
-                A portfolio showcasing the design and development work of Berat Murathan Bayram.
-              </h2>
-              <p >
-                From web applications to mobile apps, explore a diverse range of projects that highlight creativity, technical skills, and a passion for crafting exceptional digital experiences.
-              </p>
-            </div>
-          </div>
-          <div className="col">
-            <div>
-              <Image src="/assets/my-photo2.png" width={200} height={200} />
-            </div>
-          </div>
-        </div>
-        <div className="row">
-          <div className="col">
-            <div>
-              <Image src="/assets/my-photo2.png" width={200} height={200} />
-            </div>
-          </div>
-          <div className="col">
-            <div className="card">
-              <h2>
-                Explore the portfolio of Berat Murathan Bayram, a talented designer and developer.
-              </h2>
-              <p>
-                Discover a collection of innovative projects that demonstrate expertise in web and mobile development, UI/UX design, and creative problem-solving.
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="row">
-          <div className="img">
-            <Image src="/assets/my-photo2.png" width={200} height={200} />
-          </div>
-        </div>
-        <div className="svg-path">
-          <svg width="2626" height="3685" viewBox="0 0 2626 3685" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M1467.96 185.748C1467.96 152.248 1509.75 -271.625 290.686 797.748C-837.656 1787.54 2844.09 1814.76 2531.05 2549.56C2218.01 3284.37 -238.795 3270.79 290.686 2370.72C820.168 1470.64 1677.86 3657.25 1677.86 3657.25" stroke="#455CE9" stroke-width="150" />
-          </svg>
 
-        </div>
-      </section>
-
-      <section className="outro">
-        <h1 className="text-4xl font-bold text-black">Clearer organization
-          of portfolio items coming soon...
-        </h1>
-      </section>
 
     </main >
   );

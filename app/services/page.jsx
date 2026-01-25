@@ -46,7 +46,7 @@ export default function Services() {
     return (
         <div ref={servicesRef} className='min-h-screen w-screen flex flex-col'>
 
-            <section className="hero-services h-screen relative w-screen  bg-[#FFF5BA] flex justify-center items-center">
+            <section className="hero-services h-screen relative w-screen flex justify-center items-center">
                 <WaterRippleWrapper quality={0.80} />
                 <div className='hero-scale absolute left-10 bottom-14 text-5xl font-semibold text-[#FFF5BA] z-10 pointer-events-none leading-12'>
                     Helping brands to stand out in the digital era.<br/> No nonsense, always on the cutting edge.
@@ -66,6 +66,8 @@ export default function Services() {
                     ))}
                 </div>
             </section>
+
+
 
         </div>
     );

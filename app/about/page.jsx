@@ -4,6 +4,10 @@ import { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import LogoTilt from "./TiltLogo";
+import GsapDeneme from "./GsapDeneme";
+import { Grid } from "lucide-react";
+import GridStagger from "./GsapDeneme";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -23,7 +27,7 @@ function AboutPage() {
             translateY: 0,
             backgroundColor: "#ffffff"
         }, {
-            clipPath: "ellipse(100% 70% at 50% 50%)", 
+            clipPath: "ellipse(100% 70% at 50% 50%)",
             backgroundColor: "#000000",
             translateY: 100,
             duration: 1,
@@ -68,12 +72,12 @@ function AboutPage() {
     }, { scope: containerRef });
 
     return (
-        <div ref={containerRef} className="min-h-screen w-screen overflow-x-hidden">
+        <div ref={containerRef} className="min-h-screen w-screen overflow-x-hidden bg-neutral-100">
 
             <section className="hero-container h-96 flex items-center overflow-hidden px-4 md:px-8 bg-gray-100 border-b border-gray-300">
 
 
-                <div className="about-hero w-full flex justify-between max-md:flex-col text-[16vw] md:text-[10vw] text-black font-semibold tracking-tighter">
+                <div className="about-hero w-full flex justify-between max-md:flex-col text-[16vw] md:text-[12vw] text-black font-semibold tracking-tighter">
                     <div className="word-1 leading-none">
                         NOCH
                     </div>
@@ -84,17 +88,20 @@ function AboutPage() {
 
             </section>
 
-            <section className="h-screen  text-red-400 text-9xl border border-red-400 flex justify-center items-center">
-                <div className="w-64 h-64 box border-red-400 flex justify-center items-center text-center">
-                    Scroll me
-                </div>
-            </section>
+            <section style={{
+                background: "radial-gradient(70.77% 70.77% at 0% 70.77%, #ffd9b0 0%, #fd9f3b 80.73%, #ff8709 100%);"
+            }} className="h-[100vh]  flex items-center justify-center">
 
-            <section className="bg-[#1a1a1a] h-screen text-white flex justify-center items-center">
-                <h1>İçerik Devam Ediyor...</h1>
             </section>
 
 
+            <section className="h-[100vh] flex items-center justify-center">
+                <LogoTilt/>
+            </section>
+
+            <section className="min-h-screen bg-neutral-900">
+                <GridStagger/>
+            </section>
         </div>
     );
 }

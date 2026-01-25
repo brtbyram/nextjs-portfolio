@@ -5,7 +5,7 @@
   justify-content: center;
   position: relative; /* Katmanları üst üste bindirmek için */
   overflow: hidden;
-  background-color: #000; /* Arka plan rengi */
+  background-color: red; /* Arka plan rengi */
 }
 
 /* Ortak tipografi ayarları */

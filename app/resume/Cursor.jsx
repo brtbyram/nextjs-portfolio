@@ -1,90 +1,68 @@
-// components/UI/Cursor.tsx
 "use client";
-
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import gsap from "gsap";
-import { useCursor } from "../../lib/context/CursorContext";
+import { useGSAP } from "@gsap/react";
+import { useCursor } from "@/lib/context/CursorContext";
 
 const Cursor = () => {
   const { variant, cursorText } = useCursor();
   const cursorRef = useRef(null);
   const textRef = useRef(null);
+  const mouse = useRef({ x: 0, y: 0 });
+  const circle = useRef({ x: 0, y: 0 });
+  const speed = 0.10; 
 
-  useEffect(() => {
-    const cursor = cursorRef.current;
-    if (!cursor) return;
-
-    // 1. Setup GSAP quickTo for Performance (React render loop'a girmez)
-    const xTo = gsap.quickTo(cursor, "x", { duration: 0.3, ease: "power3" });
-    const yTo = gsap.quickTo(cursor, "y", { duration: 0.3, ease: "power3" });
-
-    // 2. Mouse Move Event
-    const moveShape = (e) => {
-      xTo(e.clientX);
-      yTo(e.clientY);
+  useGSAP(() => {
+    const manageMouseMove = (e) => {
+      mouse.current.x = e.clientX;
+      mouse.current.y = e.clientY;
     };
-
-    window.addEventListener("mousemove", moveShape);
-
+    window.addEventListener("mousemove", manageMouseMove);
+    const loop = () => {
+      if (!cursorRef.current) return;
+      circle.current.x += (mouse.current.x - circle.current.x) * speed;
+      circle.current.y += (mouse.current.y - circle.current.y) * speed;
+      gsap.set(cursorRef.current, { x: circle.current.x, y: circle.current.y, xPercent: -50, yPercent: -50 });
+    };
+    gsap.ticker.add(loop);
     return () => {
-      window.removeEventListener("mousemove", moveShape);
+      window.removeEventListener("mousemove", manageMouseMove);
+      gsap.ticker.remove(loop);
     };
   }, []);
 
-  // 3. Variant Animations (Duruma göre şekil değiştirme)
-  useEffect(() => {
-    const cursor = cursorRef.current;
-    const text = textRef.current;
-    if (!cursor) return;
-
+  useGSAP(() => {
+    if (!cursorRef.current) return;
+    
     if (variant === "default") {
-      // Normal küçük nokta
-      gsap.to(cursor, {
-        width: 16,
-        height: 16,
-        backgroundColor: "white",
-        mixBlendMode: "difference", // Maskeleme efekti için kilit nokta
-        duration: 0.5,
-        ease: "power2.out",
-      });
-      if (text) gsap.to(text, { opacity: 0, duration: 0.2 });
-    } else if (variant === "text") {
-      // İçinde yazı olan büyük yuvarlak
-      gsap.to(cursor, {
-        width: 120,
-        height: 120,
-        backgroundColor: "white",
-        mixBlendMode: "difference",
-        duration: 0.4,
-        ease: "back.out(1.7)", // Hafif elastik efekt
-      });
-      if (text) gsap.to(text, { opacity: 1, delay: 0.1, duration: 0.2 });
-    } else if (variant === "mask") {
-      // Maskeleme alanına girince cursor'ı biraz büyüt ama şeffaf yap
-      // Böylece kullanıcı maskenin nerede olduğunu hisseder ama yazıyı kapatmaz
-      gsap.to(cursor, {
-        width: 0, // Maske boyutuyla yaklaşık aynı olsun
-        height: 0,
-        backgroundColor: "transparent",
-        mixBlendMode: "normal",
-        duration: 0.3,
-      });
-      if (text) gsap.to(text, { opacity: 0, duration: 0.2 });
+      gsap.to(cursorRef.current, { scale: 1, opacity: 1, backgroundColor: "white", mixBlendMode: "difference", duration: 0.4 });
+      if (textRef.current) gsap.to(textRef.current, { opacity: 0 });
+    } 
+    else if (variant === "text") {
+      gsap.to(cursorRef.current, { scale: 6, backgroundColor: "white", mixBlendMode: "difference", duration: 0.5 });
+      if (textRef.current) gsap.to(textRef.current, { opacity: 1 });
     }
+if (variant === "mask") {
+    // Pat diye yok olmak yerine yumuşakça solarak küçülür
+    gsap.to(cursorRef.current, { 
+      opacity: 0, 
+      scale: 0, 
+      duration: 0.5, 
+      ease: "power2.out" 
+    });
+  } else {
+    gsap.to(cursorRef.current, { 
+      opacity: 1, 
+      scale: variant === "text" ? 6 : 1, 
+      duration: 0.5,
+      ease: "expo.out"
+    });
+  }
   }, [variant]);
 
   return (
-    <div
-      ref={cursorRef}
-      className="fixed top-0 left-0 rounded-full pointer-events-none z-[9999] flex items-center justify-center overflow-hidden"
-      style={{
-        transform: "translate(-50%, -50%)", // Başlangıçta tam ortalamak için
-      }}
-    >
-      <span
-        ref={textRef}
-        className="text-black text-[14px] font-bold opacity-0 whitespace-nowrap uppercase tracking-wider"
-      >
+    <div ref={cursorRef} className="fixed top-0 left-0 w-4 h-4 rounded-full pointer-events-none z-[9999] flex items-center justify-center bg-white">
+      <span ref={textRef} className="text-[2px] text-black font-bold opacity-0 uppercase tracking-widest">
         {cursorText}
       </span>
     </div>

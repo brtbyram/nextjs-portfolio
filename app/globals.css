@@ -55,22 +55,109 @@
   --ci-beige: #f0ece5;
   --ci-peach: #ffdcc1;
   --smooth-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --mouse-x: 0px;
+  --mouse-y: 0px;
+  --boxColor: #0ff7;
+
 }
 
 * {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -o-font-smoothing: antialiased;
-  -webkit-appearance: none;
   box-sizing: border-box;
   padding: 0;
 }
+
+* {
+  cursor: none !important;
+}
+
+
+.mask-layer {
+  --x: 50%;
+  --y: 50%;
+
+  -webkit-mask-image: radial-gradient(circle 80px at var(--x) var(--y),
+      transparent 0%,
+      black 100%);
+
+  mask-image: radial-gradient(circle 80px at var(--x) var(--y),
+      transparent 0%,
+      black 100%);
+}
+
+.reveal-container {
+  display: grid;
+  place-items: center;
+  position: relative;
+  overflow: hidden;
+  background: #000;
+  /* Arka plan siyah */
+  padding: 40px;
+}
+
+/* Her iki yazı aynı hücreye (row 1 / col 1) hapsolur */
+.reveal-text {
+  grid-area: 1 / 1;
+  font-size: 8vw;
+  font-weight: 900;
+  text-transform: uppercase;
+  white-space: nowrap;
+  line-height: 1;
+  user-select: none;
+}
+
+/* Varsayılan görünen yazı */
+.text-behind {
+  color: #222;
+  /* Sönük gri */
+  z-index: 1;
+}
+
+/* Maske ile açılacak olan yazı */
+.text-front {
+  color: #fff;
+  /* Parlak beyaz */
+  z-index: 2;
+  /* Başlangıçta görünmez (Daire çapı 0) */
+  clip-path: circle(0px at var(--mouse-x, 0px) var(--mouse-y, 0px));
+}
+
+
+/* Dokunmatik cihazlarda özel imleci gizlemek mantıklı olabilir */
+@media (max-width: 768px) {
+  .custom-cursor {
+    display: none;
+  }
+
+  * {
+    cursor: auto !important;
+  }
+}
+
+
 
 body {
   font-family: var(--font-family-normal);
   font-size: var(--font-size-p1);
   line-height: var(--line-height-135);
   font-weight: var(--font-weight-medium);
+}
+
+.title {
+  display: block;
+  margin-block-start: 0.67em;
+  margin-block-end: 0.67em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+
+  unicode-bidi: isolate;
+  line-height: 1.2;
+  -webkit-font-smoothing: subpixel-antialiased;
+  margin: 0;
+  letter-spacing: -0.25rem;
+  font-family: "Poppins", sans-serif;
 }
 
 
@@ -90,26 +177,198 @@ body {
   .h3 {
     @apply text-[20px] xl:text-[24px] leading-[1.1] font-semibold
   }
+}
 
-  .text-outline {
-    -webkit-text-stroke: 1px #ffffff;
-  }
 
-  .text-outline-hover {
-    -webkit-text-stroke: 1px #00ff99;
-  }
+.scene {
+  perspective: 1200px;
+  perspective-origin: center center;
+  /* Kamerayı biraz yukarı kaldırdım */
+}
 
+/* --- PRİZMA AYARLARI --- */
+.prism {
+  /* 1. DEĞİŞKENLER: Boyutları buradan yönetiyoruz. GSAP burayı hedefleyecek. */
+  --p-width: clamp(350px, 60vw, 820px);
+  /* Genişlik */
+  --p-height: 100px;
+  /* Yükseklik */
+  --p-depth: 100px;
+  /* Derinlik */
+
+  position: relative;
+  transform-style: preserve-3d;
+  width: var(--p-width);
+  height: var(--p-height);
+  transition: all 0.5s var(--smooth-ease);
+
+}
+
+
+.prism:hover {
+  transform: rotateX(-25deg) scale(1.05) translateY(-20px) translateX(-0px);
+}
+
+
+/* --- YÜZEYLER (GENEL) --- */
+.face {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  /* İçerik Yönetimi: Yazıları ortala ve boyutunu bağımsız yap */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 32px;
+  /* ARTIK GEOMETRİDEN BAĞIMSIZ! */
+  font-weight: bold;
+  color: #333;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1) inset;
+  /* Kenar çizgisi efekti */
+  backface-visibility: hidden;
+  /* İsteğe bağlı: arkası dönükken gizle */
+}
+
+/* --- BOYUTLANDIRMA VE KONUMLANDIRMA (OTOMATİK HESAPLAMA) --- */
+
+/* ÖN ve ARKA: Genişlik x Yükseklik */
+.face-front,
+.face-back {
+  width: var(--p-width);
+  height: var(--p-height);
+  margin-left: calc(var(--p-width) / -2);
+  margin-top: calc(var(--p-height) / -2);
+}
+
+/* SAĞ ve SOL: Derinlik x Yükseklik */
+.face-right,
+.face-left {
+  width: var(--p-depth);
+  height: var(--p-height);
+  margin-left: calc(var(--p-depth) / -2);
+  margin-top: calc(var(--p-height) / -2);
+}
+
+/* ÜST ve ALT: Genişlik x Derinlik */
+.face-top,
+.face-bottom {
+  width: var(--p-width);
+  height: var(--p-depth);
+  margin-left: calc(var(--p-width) / -2);
+  margin-top: calc(var(--p-depth) / -2);
+}
+
+/* --- TRANSFORM (MATEMATİKSEL YERLEŞTİRME) --- */
+/* Mantık: Her yüzü kendi ekseninde "Diğer Boyut / 2" kadar it */
+
+.face-front {
+  transform: translateZ(calc(var(--p-depth) / 2));
+}
+
+.face-back {
+  transform: rotateY(180deg) translateZ(calc(var(--p-depth) / 2));
+  background: #ddd;
+}
+
+.face-right {
+  transform: rotateY(90deg) translateZ(calc(var(--p-width) / 2));
+  background: #ccc;
+}
+
+.face-left {
+  transform: rotateY(-90deg) translateZ(calc(var(--p-width) / 2));
+  background: #ccc;
+}
+
+.face-top {
+  transform: rotateX(90deg) translateZ(calc(var(--p-height) / 2));
+
+}
+
+.face-bottom {
+  transform: rotateX(-90deg) translateZ(calc(var(--p-height) / 2));
+  background: #999;
+}
+
+/* --- İÇERİK ÖZELLEŞTİRMESİ --- */
+/* Örnek: Yan taraftaki yazı dikey dursun isteyebilirsin */
+.face-right span,
+.face-left span {
+  /* writing-mode: vertical-rl; */
+  /* İstersen dikey yaz */
 }
 
 
 
 
-.spotlight svg path {
-  stroke-dasharray: 12000;
-  stroke-dashoffset: 12000;
-  animation: dash 5s forwards ease-in-out;
+
+
+
+.card {
+  font-size: 100px;
+  width: 8em;
+  height: 1em;
+  transform-style: preserve-3d;
+  transition: all 0.5s;
+  backface-visibility: hidden;
+  transform-origin: center center;
 }
 
-.heroHeading {
-  mix-blend-mode: difference !important;
-} 
+.card:hover {
+  transform: rotateX(12deg) rotateY(4deg) translateZ(-0.5em) scale(1.05);
+  margin: 0.4em 0;
+}
+
+.card-left,
+.card-right,
+.card-front,
+.card-back {
+  position: absolute;
+  backface-visibility: hidden;
+  box-shadow: 0 0 0.1em #000a inset;
+}
+
+.card-left,
+.card-right {
+  width: 2em;
+  height: 1em;
+
+}
+
+.card-front,
+.card-back {
+  width: 8em;
+  height: 1em;
+}
+
+.card-front {
+  transform: translateZ(-1em);
+}
+
+.card-back {
+  transform: rotateY(180deg) translateZ(-1em)
+}
+
+.card-right {
+  transform: rotateY(270deg) translateZ(-7em)
+}
+
+.card-left {
+  transform: rotateY(90deg) translateZ(-1em)
+}
+
+.card-top {
+  position: absolute;
+  width: 8em;
+  height: 2em;
+
+  transform: rotateX(90deg) translateZ(1em)
+}
+
+.card-bottom {
+  position: absolute;
+  width: 8em;
+  height: 2em;
+  bottom: 0;
+  transform: rotateX(270deg) translateZ(1em)
+}
